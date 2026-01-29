@@ -1,0 +1,32 @@
+flags=-O2 -Wall -std=c23 -I.
+soflags=-ldl -shared -fPIC
+ldflags=
+
+.PHONY: clean
+
+all: clean osapi.so diskutil
+
+osapi.so: osapi.o disk.o omnistd.o fs.o
+	cc $(flags) $(CLAGS) $(soflags) $^ -o $@
+
+osapi.o: osapi.c osapi.h os.h
+	cc $(flags) $(CFLAGS) -c $<
+
+disk.o: disk.c disk.h
+	cc $(flags) $(CFLAGS) -c $<
+
+omnistd.o: omnistd.c omnistd.h
+	cc $(flags) $(CFLAGS) -c $<
+
+fs.o: fs.c fs.h
+	cc $(flags) $(CFLAGS) -c $<
+
+diskutil: diskutil.o osapi.o disk.o omnistd.o fs.o
+	cc $(flags) $(CFLAGS) $^ -o $@
+	mv -f diskutil ../util
+
+diskutil.o: diskutil.c
+	cc $(flags) $(CFLAGS) -c $<
+
+clean:
+	rm -f *.so *.o
